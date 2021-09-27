@@ -1,0 +1,3 @@
+(function () {
+    $('.uploader-drop').show();
+})()
