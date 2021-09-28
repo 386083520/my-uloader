@@ -5,6 +5,11 @@ function Uploader (opts) {
     console.log(opts)
 }
 utils.extend(Uploader.prototype, {
+    _trigger: function (name) {
+    },
+    addFiles: function (files, evt) {
+        console.log('gsdaddFiles', files, evt)
+    },
     assignBrowse: function (domNodes, isDirectory, singleFile, attributes) {
         console.log('gsdassignBrowse')
         if (typeof domNodes.length === 'undefined') {
@@ -31,6 +36,15 @@ utils.extend(Uploader.prototype, {
                     input.click()
                 }, false)
             }
+            var that = this
+            input.addEventListener('change', function (e) {
+                console.log('gsd', e, e.type, e.target.value, e.target.files)
+                that._trigger(e.type, e)
+                if (e.target.value) {
+                    that.addFiles(e.target.files, e)
+                    e.target.value = ''
+                }
+            })
         }, this)
     }
 })
