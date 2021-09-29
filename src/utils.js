@@ -44,6 +44,14 @@ var utils = {
             }
         }
     },
-    isFunction: isFunction
+    isFunction: isFunction,
+    defineNonEnumerable: function (target, key, value) {
+        Object.defineProperty(target, key, {
+            enumerable: false,
+            configurable: true,
+            writable: true,
+            value: value
+        })
+    }
 }
 module.exports = utils

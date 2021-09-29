@@ -6,6 +6,7 @@ var ie10plus = isServer ? false : window.navigator.msPointerEnabled
 function Uploader (opts) {
     this.opts = utils.extend({}, Uploader.defaults, opts || {})
     console.log(opts)
+    File.call(this, this)
 }
 
 Uploader.defaults = {
@@ -75,6 +76,7 @@ utils.extend(Uploader.prototype, {
     },
     getFromUniqueIdentifier: function (uniqueIdentifier) {
         var ret = false
+        console.log('gsdgetFromUniqueIdentifier', this.files)
         utils.each(this.files, function (file) {
             if (file.uniqueIdentifier === uniqueIdentifier) {
                 ret = file
