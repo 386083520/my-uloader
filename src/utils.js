@@ -1,4 +1,14 @@
+var oproto = Object.prototype
+var serialize = oproto.toString
+var isFunction = function (fn) {
+    return serialize.call(fn) === '[object Function]'
+}
+
+var i = 0
 var utils = {
+    uid: function () {
+        return ++i
+    },
     extend: function () {
         var options
         var name
@@ -33,6 +43,7 @@ var utils = {
                 }
             }
         }
-    }
+    },
+    isFunction: isFunction
 }
 module.exports = utils

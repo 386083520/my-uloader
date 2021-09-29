@@ -1,14 +1,32 @@
 var utils = require('./utils')
+var File = require('./file')
+var isServer = typeof window === 'undefined'
+var ie10plus = isServer ? false : window.navigator.msPointerEnabled
 
 function Uploader (opts) {
-    this.opts = opts
+    this.opts = utils.extend({}, Uploader.defaults, opts || {})
     console.log(opts)
 }
+
+Uploader.defaults = {
+    generateUniqueIdentifier: null,
+    allowDuplicateUploads: false
+}
+
 utils.extend(Uploader.prototype, {
     _trigger: function (name) {
     },
     addFiles: function (files, evt) {
         console.log('gsdaddFiles', files, evt)
+        utils.each(files, function (file) {
+            if ((!ie10plus || ie10plus && file.size > 0) && !(file.size % 4096 === 0 && (file.name === '.' || file.fileName === '.'))) {
+                var uniqueIdentifier = this.generateUniqueIdentifier(file)
+                if (this.opts.allowDuplicateUploads || !this.getFromUniqueIdentifier(uniqueIdentifier)) {
+                    var _file = new File(this, file, this)
+                    _file.uniqueIdentifier = uniqueIdentifier
+                }
+            }
+        }, this)
     },
     assignBrowse: function (domNodes, isDirectory, singleFile, attributes) {
         console.log('gsdassignBrowse')
@@ -46,6 +64,24 @@ utils.extend(Uploader.prototype, {
                 }
             })
         }, this)
+    },
+    generateUniqueIdentifier: function (file) {
+        var custom = this.opts.generateUniqueIdentifier
+        if (utils.isFunction(custom)) {
+            return custom(file)
+        }
+        var relativePath = file.relativePath || file.webkitRelativePath || file.fileName || file.name
+        return file.size + '-' + relativePath.replace(/[^0-9a-zA-Z_-]/img, '')
+    },
+    getFromUniqueIdentifier: function (uniqueIdentifier) {
+        var ret = false
+        utils.each(this.files, function (file) {
+            if (file.uniqueIdentifier === uniqueIdentifier) {
+                ret = file
+                return false
+            }
+        })
+        return ret
     }
 })
 
