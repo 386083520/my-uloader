@@ -1,5 +1,6 @@
 var oproto = Object.prototype
 var serialize = oproto.toString
+var aproto = Array.prototype
 var isFunction = function (fn) {
     return serialize.call(fn) === '[object Function]'
 }
@@ -52,6 +53,11 @@ var utils = {
             writable: true,
             value: value
         })
-    }
+    },
+    toArray: function (ary, start, end) {
+        if (start === undefined) start = 0
+        if (end === undefined) end = ary.length
+        return aproto.slice.call(ary, start, end)
+    },
 }
 module.exports = utils

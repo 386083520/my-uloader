@@ -1,5 +1,6 @@
 var utils = require('./utils')
 var File = require('./file')
+var event = require('./event')
 var isServer = typeof window === 'undefined'
 var ie10plus = isServer ? false : window.navigator.msPointerEnabled
 
@@ -14,8 +15,18 @@ Uploader.defaults = {
     allowDuplicateUploads: false
 }
 
+utils.extend(Uploader.prototype, event)
+
 utils.extend(Uploader.prototype, {
     _trigger: function (name) {
+        var args = utils.toArray(arguments)
+        var preventDefault = !this.trigger.apply(this, arguments)
+        if (name !== 'catchAll') {
+            args.unshift('catchAll')
+            preventDefault = !this.trigger.apply(this, args) || preventDefault
+        }
+        console.log('gsdargs', args)
+        return !preventDefault
     },
     addFiles: function (files, evt) {
         console.log('gsdaddFiles', files, evt)
