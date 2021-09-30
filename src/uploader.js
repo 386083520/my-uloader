@@ -25,7 +25,7 @@ utils.extend(Uploader.prototype, {
             args.unshift('catchAll')
             preventDefault = !this.trigger.apply(this, args) || preventDefault
         }
-        console.log('gsdargs', args)
+        console.log('gsdargs', name, preventDefault)
         return !preventDefault
     },
     addFiles: function (files, evt) {
@@ -36,6 +36,9 @@ utils.extend(Uploader.prototype, {
                 if (this.opts.allowDuplicateUploads || !this.getFromUniqueIdentifier(uniqueIdentifier)) {
                     var _file = new File(this, file, this)
                     _file.uniqueIdentifier = uniqueIdentifier
+                    if (this._trigger('fileAdded', _file, evt)) {
+
+                    }
                 }
             }
         }, this)
