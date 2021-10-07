@@ -12,11 +12,13 @@ function Uploader (opts) {
 
 Uploader.defaults = {
     generateUniqueIdentifier: null,
-    allowDuplicateUploads: false
+    allowDuplicateUploads: false,
+    singleFile: false,
 }
 
-utils.extend(Uploader.prototype, event)
 
+Uploader.prototype = utils.extend({}, File.prototype)
+utils.extend(Uploader.prototype, event)
 utils.extend(Uploader.prototype, {
     _trigger: function (name) {
         var args = utils.toArray(arguments)
@@ -29,7 +31,9 @@ utils.extend(Uploader.prototype, {
         return !preventDefault
     },
     addFiles: function (files, evt) {
+        var _files = []
         console.log('gsdaddFiles', files, evt)
+        var oldFileListLen = this.fileList.length
         utils.each(files, function (file) {
             if ((!ie10plus || ie10plus && file.size > 0) && !(file.size % 4096 === 0 && (file.name === '.' || file.fileName === '.'))) {
                 var uniqueIdentifier = this.generateUniqueIdentifier(file)
@@ -37,11 +41,29 @@ utils.extend(Uploader.prototype, {
                     var _file = new File(this, file, this)
                     _file.uniqueIdentifier = uniqueIdentifier
                     if (this._trigger('fileAdded', _file, evt)) {
-
+                        _files.push(_file)
+                    }else {
+                        // TODO
                     }
                 }
             }
         }, this)
+        var newFileList = this.fileList.slice(oldFileListLen)
+        if (this._trigger('filesAdded', _files, newFileList, evt)) {
+            utils.each(_files, function (file) {
+                if (this.opts.singleFile && this.files.length > 0) {
+                    this.removeFile(this.files[0])
+                }
+                this.files.push(file)
+                console.log('gsdfiles', this.files)
+            }, this)
+        } else {
+            // TODO
+        }
+    },
+    removeFile: function (file) {
+        File.prototype.removeFile.call(this, file)
+        this._trigger('fileRemoved', file)
     },
     assignBrowse: function (domNodes, isDirectory, singleFile, attributes) {
         console.log('gsdassignBrowse')
