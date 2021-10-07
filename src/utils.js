@@ -59,5 +59,8 @@ var utils = {
         if (end === undefined) end = ary.length
         return aproto.slice.call(ary, start, end)
     },
+    isString: function (s) {
+        return typeof s === 'string'
+    }
 }
 module.exports = utils
