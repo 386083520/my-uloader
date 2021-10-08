@@ -59,6 +59,7 @@ utils.extend(Uploader.prototype, {
                 this.files.push(file)
                 console.log('gsdfiles', this.files)
             }, this)
+            this._trigger('filesSubmitted', _files, newFileList, evt)
         } else {
             // TODO
         }
@@ -126,6 +127,9 @@ utils.extend(Uploader.prototype, {
     },
     uploadNextChunk: function (preventEvents) {
 
+    },
+    upload: function (preventEvents) {
+        console.log('gsdupload')
     }
 })
 

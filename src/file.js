@@ -36,6 +36,12 @@ function File (uploader, file, parent) {
 }
 
 utils.extend(File.prototype, {
+    _eachAccess: function (eachFn, fileFn) {
+        console.log('gsd_eachAccess', this)
+        if (this.isFolder) {
+        }
+        fileFn.call(this, this)
+    },
     _parseFile: function () {
         var ppaths = parsePaths(this.relativePath)
         if (ppaths.length) {
@@ -109,6 +115,12 @@ utils.extend(File.prototype, {
     },
     _resetError: function () {
 
+    },
+    resume: function () {
+        this._eachAccess(function (f) {
+        }, function () {
+            this.uploader.upload()
+        })
     }
 })
 
