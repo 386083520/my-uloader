@@ -2,6 +2,7 @@ var utils = require('./utils')
 function File (uploader, file, parent) {
     utils.defineNonEnumerable(this, 'uploader', uploader)
     this.isRoot = this.isFolder = uploader === this
+    utils.defineNonEnumerable(this, 'parent', parent || null)
     console.log('gsdFile', this.isRoot, this.isFolder, uploader, this)
     this.id = utils.uid()
     console.log('gsdFile', this)
@@ -41,6 +42,7 @@ utils.extend(File.prototype, {
             file = this
         }
         var p = this.parent
+        console.log('gsd_updateParentFileList', file, p)
         if (p) {
             p.fileList.push(file)
         }

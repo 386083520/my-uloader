@@ -60,6 +60,7 @@ utils.extend(Uploader.prototype, {
         } else {
             // TODO
         }
+        console.log('addFiles', this.files, this.fileList)
     },
     removeFile: function (file) {
         File.prototype.removeFile.call(this, file)
