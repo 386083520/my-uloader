@@ -1,4 +1,6 @@
 var utils = require('./utils')
+var Chunk = require('./chunk')
+
 function File (uploader, file, parent) {
     utils.defineNonEnumerable(this, 'uploader', uploader)
     this.isRoot = this.isFolder = uploader === this
@@ -8,6 +10,7 @@ function File (uploader, file, parent) {
     console.log('gsdFile', this)
     utils.defineNonEnumerable(this, 'files', [])
     utils.defineNonEnumerable(this, 'fileList', [])
+    utils.defineNonEnumerable(this, 'chunks', [])
 
     if (this.isRoot || !file) {
         this.file = null
@@ -24,6 +27,10 @@ function File (uploader, file, parent) {
             this._parseFile()
         }
     }
+
+    this.aborted = false
+    this.averageSpeed = 0
+    this.currentSpeed = 0
 
     this.bootstrap()
 }
@@ -68,6 +75,40 @@ utils.extend(File.prototype, {
     },
     bootstrap: function () {
         if (this.isFolder) return
+        var opts = this.uploader.opts
+        // TODO
+        this.abort(true)
+        this._resetError()
+        // TODO
+        var round = opts.forceChunkSize ? Math.ceil : Math.floor
+        var chunks = Math.max(round(this.size / opts.chunkSize), 1)
+        console.log('gsdchunks', chunks)
+        for (var offset = 0; offset < chunks; offset++) {
+            this.chunks.push(new Chunk(this.uploader, this, offset))
+        }
+        console.log('gsdthis.chunks', this.chunks)
+    },
+    abort: function (reset) {
+        if (this.aborted) {
+            return
+        }
+        this.currentSpeed = 0
+        this.averageSpeed = 0
+        this.aborted = !reset
+        var chunks = this.chunks
+        if (reset) {
+            this.chunks = []
+        }
+        var uploadingStatus = Chunk.STATUS.UPLOADING
+        utils.each(chunks, function (c) {
+            if (c.status() === uploadingStatus) {
+                c.abort()
+                this.uploader.uploadNextChunk()
+            }
+        }, this)
+    },
+    _resetError: function () {
+
     }
 })
 

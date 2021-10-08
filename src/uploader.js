@@ -11,6 +11,8 @@ function Uploader (opts) {
 }
 
 Uploader.defaults = {
+    chunkSize: 1024 * 1024,
+    forceChunkSize: false,
     generateUniqueIdentifier: null,
     allowDuplicateUploads: false,
     singleFile: false,
@@ -121,6 +123,9 @@ utils.extend(Uploader.prototype, {
             }
         })
         return ret
+    },
+    uploadNextChunk: function (preventEvents) {
+
     }
 })
 
