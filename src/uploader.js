@@ -1,6 +1,7 @@
 var utils = require('./utils')
 var File = require('./file')
 var event = require('./event')
+var Chunk = require('./chunk')
 var isServer = typeof window === 'undefined'
 var ie10plus = isServer ? false : window.navigator.msPointerEnabled
 
@@ -149,7 +150,22 @@ utils.extend(Uploader.prototype, {
         }
     },
     _shouldUploadNext: function () {
-        console.log('gsd_shouldUploadNext')
+        var num = 0
+        var should = true
+        var simultaneousUploads = this.opts.simultaneousUploads
+        var uploadingStatus = Chunk.STATUS.UPLOADING
+        utils.each(this.files, function (file) {
+            utils.each(file.chunks, function (chunk) {
+                if (chunk.status() === uploadingStatus) {
+                    num++
+                    if (num >= simultaneousUploads) {
+                        should = false
+                        return false
+                    }
+                }
+            })
+        })
+        return should && num
     }
 })
 
