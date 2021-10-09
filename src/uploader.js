@@ -18,6 +18,9 @@ Uploader.defaults = {
     generateUniqueIdentifier: null,
     allowDuplicateUploads: false,
     singleFile: false,
+    prioritizeFirstAndLastChunk: false,
+    checkChunkUploadedByResponse: null,
+    initialPaused: false,
 }
 
 
@@ -132,10 +135,43 @@ utils.extend(Uploader.prototype, {
         return ret
     },
     uploadNextChunk: function (preventEvents) {
-        console.log('gsduploadNextChunk')
+        var found = false
+        var pendingStatus = Chunk.STATUS.PENDING
+        var checkChunkUploaded = this.uploader.opts.checkChunkUploadedByResponse
+        if (this.opts.prioritizeFirstAndLastChunk) {
+            // TODO
+        }
+        utils.each(this.files, function (file) {
+            if (!file.paused) {
+                // TODO
+                utils.each(file.chunks, function (chunk) {
+                    if (chunk.status() === pendingStatus) {
+                        chunk.send()
+                        found = true
+                        return false
+                    }
+                })
+            }
+            if (found) {
+                return false
+            }
+          }
+        )
+        if (found) {
+            return true
+        }
+        var outstanding = false
+        utils.each(this.files, function (file) {
+            if (!file.isComplete()) {
+                outstanding = true
+                return false
+            }
+        })
+        return outstanding
     },
     upload: function (preventEvents) {
         var ret = this._shouldUploadNext()
+        console.log('gsdret', ret)
         if (ret === false) {
             return
         }
@@ -164,6 +200,7 @@ utils.extend(Uploader.prototype, {
                     }
                 }
             })
+            return should
         })
         return should && num
     }

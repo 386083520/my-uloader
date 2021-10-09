@@ -31,6 +31,7 @@ function File (uploader, file, parent) {
     this.aborted = false
     this.averageSpeed = 0
     this.currentSpeed = 0
+    this.paused = uploader.opts.initialPaused
 
     this.bootstrap()
 }
@@ -119,8 +120,13 @@ utils.extend(File.prototype, {
     resume: function () {
         this._eachAccess(function (f) {
         }, function () {
+            this.paused = false
             this.uploader.upload()
         })
+        this.paused = false
+    },
+    isComplete: function () {
+        return true
     }
 })
 

@@ -5,12 +5,19 @@ function Chunk (uploader, file, offset) {
     this.offset = offset
 }
 var STATUS = Chunk.STATUS = {
+    PENDING: 'pending',
     UPLOADING: 'uploading'
 }
 
 utils.extend(Chunk.prototype, {
     abort: function () {
         console.log('gsdabort')
+    },
+    status: function (isTest) {
+        return STATUS.PENDING
+    },
+    send: function () {
+        console.log('gsdsend')
     }
 })
 
