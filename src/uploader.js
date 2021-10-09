@@ -21,6 +21,9 @@ Uploader.defaults = {
     prioritizeFirstAndLastChunk: false,
     checkChunkUploadedByResponse: null,
     initialPaused: false,
+    permanentErrors: [404, 415, 500, 501],
+    successStatuses: [200, 201, 202],
+    maxChunkRetries: 0,
 }
 
 
