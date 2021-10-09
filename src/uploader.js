@@ -11,6 +11,7 @@ function Uploader (opts) {
 }
 
 Uploader.defaults = {
+    simultaneousUploads: 3,
     chunkSize: 1024 * 1024,
     forceChunkSize: false,
     generateUniqueIdentifier: null,
@@ -31,6 +32,10 @@ utils.extend(Uploader.prototype, {
         }
         console.log('gsdargs', name, preventDefault)
         return !preventDefault
+    },
+    _triggerAsync: function () {
+        var args = arguments
+        console.log('gsd_triggerAsync')
     },
     addFiles: function (files, evt) {
         var _files = []
@@ -126,10 +131,25 @@ utils.extend(Uploader.prototype, {
         return ret
     },
     uploadNextChunk: function (preventEvents) {
-
+        console.log('gsduploadNextChunk')
     },
     upload: function (preventEvents) {
-        console.log('gsdupload')
+        var ret = this._shouldUploadNext()
+        if (ret === false) {
+            return
+        }
+        !preventEvents && this._trigger('uploadStart')
+        var started = false
+        for (var num = 1; num <= this.opts.simultaneousUploads - ret; num++) {
+            started = this.uploadNextChunk(!preventEvents) || started
+            // TODO
+        }
+        if (!started && !preventEvents) {
+            this._triggerAsync('complete')
+        }
+    },
+    _shouldUploadNext: function () {
+        console.log('gsd_shouldUploadNext')
     }
 })
 
