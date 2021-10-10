@@ -8,6 +8,9 @@ function Chunk (uploader, file, offset) {
     this.preprocessState = 0
     this.xhr = null
     this.retries = 0
+    this.chunkSize = this.uploader.opts.chunkSize
+    this.startByte = this.offset * this.chunkSize
+    this.endByte = this.computeEndByte()
 }
 var STATUS = Chunk.STATUS = {
     READING: 'reading',
@@ -16,6 +19,9 @@ var STATUS = Chunk.STATUS = {
 }
 
 utils.extend(Chunk.prototype, {
+    computeEndByte: function () {
+        return 0 // TODO
+    },
     abort: function () {
         console.log('gsdabort')
     },
@@ -42,7 +48,19 @@ utils.extend(Chunk.prototype, {
         }
     },
     send: function () {
-        console.log('gsdsend')
+        var preprocess = this.uploader.opts.preprocess
+        var read = this.uploader.opts.readFileFn
+        if (utils.isFunction(preprocess)) {
+            // TODO
+        }
+        switch (this.readState) {
+            case 0:
+                this.readState = 1
+                read(this.file, this.file.fileType, this.startByte, this.endByte, this)
+                return
+            case 1:
+                return
+        }
     }
 })
 

@@ -5,6 +5,10 @@ var Chunk = require('./chunk')
 var isServer = typeof window === 'undefined'
 var ie10plus = isServer ? false : window.navigator.msPointerEnabled
 
+var webAPIFileRead = function (fileObj, fileType, startByte, endByte, chunk) {
+    console.log('gsdwebAPIFileRead', fileObj, fileType, startByte, endByte, chunk)
+}
+
 function Uploader (opts) {
     this.opts = utils.extend({}, Uploader.defaults, opts || {})
     console.log(opts)
@@ -24,6 +28,8 @@ Uploader.defaults = {
     permanentErrors: [404, 415, 500, 501],
     successStatuses: [200, 201, 202],
     maxChunkRetries: 0,
+    preprocess: null,
+    readFileFn: webAPIFileRead,
 }
 
 
