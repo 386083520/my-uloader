@@ -130,6 +130,23 @@ utils.extend(File.prototype, {
     },
     _chunkEvent: function (chunk, evt, message) {
         console.log('gsd_chunkEvent', chunk, evt, message)
+        var STATUS = Chunk.STATUS
+        switch (evt) {
+            case STATUS.ERROR:
+                break
+            case STATUS.SUCCESS:
+                this._updateUploadedChunks(message, chunk)
+                break
+        }
+    },
+    _updateUploadedChunks: function (message, chunk) {
+        var checkChunkUploaded = this.uploader.opts.checkChunkUploadedByResponse
+        if (checkChunkUploaded) {
+
+        }else {
+            this.uploader.uploadNextChunk()
+        }
+
     }
 })
 

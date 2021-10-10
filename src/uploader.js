@@ -50,6 +50,7 @@ Uploader.defaults = {
     processResponse: function (response, cb) {
         cb(null, response)
     },
+    checkChunkUploadedByResponse: null,
 }
 
 
