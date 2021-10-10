@@ -127,6 +127,9 @@ utils.extend(File.prototype, {
     },
     isComplete: function () {
         return true
+    },
+    _chunkEvent: function (chunk, evt, message) {
+        console.log('gsd_chunkEvent', chunk, evt, message)
     }
 })
 

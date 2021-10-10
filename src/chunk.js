@@ -17,10 +17,18 @@ function Chunk (uploader, file, offset) {
 var STATUS = Chunk.STATUS = {
     READING: 'reading',
     PENDING: 'pending',
-    UPLOADING: 'uploading'
+    UPLOADING: 'uploading',
+    SUCCESS: 'success',
+    ERROR: 'error'
 }
 
 utils.extend(Chunk.prototype, {
+    _event: function (evt, args) {
+        args = utils.toArray(arguments)
+        console.log('gsdargs', args)
+        args.unshift(this)
+        this.file._chunkEvent.apply(this.file, args)
+    },
     computeEndByte: function () {
         var endByte = Math.min(this.file.size, (this.offset + 1) * this.chunkSize)
         if (this.file.size - endByte < this.chunkSize && !this.uploader.opts.forceChunkSize) {
@@ -87,13 +95,29 @@ utils.extend(Chunk.prototype, {
         var uploadMethod = utils.evalOpts(this.uploader.opts.uploadMethod, this.file, this)
         var data = this.prepareXhrRequest(uploadMethod, false, this.uploader.opts.method, this.bytes)
         this.xhr.send(data)
-
+        var $ = this
         function progressHandler (event) {
             console.log('gsdprogressHandler')
         }
         function doneHandler (event) {
-            console.log('gsddoneHandler')
+            var msg = $.message()
+            $.uploader.opts.processResponse(msg, function (err, res) {
+                if (!$.xhr) {
+                    return
+                }
+                var status = $.status()
+                console.log('gsddoneHandler', status, res)
+                if (status === STATUS.SUCCESS || status === STATUS.ERROR) {
+                    $._event(status, res)
+                    status === STATUS.ERROR && $.uploader.uploadNextChunk()
+                } else {
+
+                }
+            })
         }
+    },
+    message: function () {
+        return this.xhr ? this.xhr.responseText : ''
     },
     getParams: function () {
         return {

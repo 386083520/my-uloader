@@ -47,6 +47,9 @@ Uploader.defaults = {
     target: '/',
     withCredentials: false,
     headers: {},
+    processResponse: function (response, cb) {
+        cb(null, response)
+    },
 }
 
 
