@@ -12,6 +12,7 @@ function Chunk (uploader, file, offset) {
     this.chunkSize = this.uploader.opts.chunkSize
     this.startByte = this.offset * this.chunkSize
     this.endByte = this.computeEndByte()
+    this.tested = false
 }
 var STATUS = Chunk.STATUS = {
     READING: 'reading',
@@ -26,6 +27,9 @@ utils.extend(Chunk.prototype, {
             endByte = this.file.size
         }
         return endByte
+    },
+    test: function () {
+
     },
     abort: function () {
         console.log('gsdabort')
@@ -72,6 +76,62 @@ utils.extend(Chunk.prototype, {
             case 1:
                 return
         }
+        if (this.uploader.opts.testChunks && !this.tested) {
+            this.test()
+            return
+        }
+        this.xhr = new XMLHttpRequest()
+        this.xhr.upload.addEventListener('progress', progressHandler, false)
+        this.xhr.addEventListener('load', doneHandler, false)
+        this.xhr.addEventListener('error', doneHandler, false)
+        var uploadMethod = utils.evalOpts(this.uploader.opts.uploadMethod, this.file, this)
+        var data = this.prepareXhrRequest(uploadMethod, false, this.uploader.opts.method, this.bytes)
+        this.xhr.send(data)
+
+        function progressHandler (event) {
+            console.log('gsdprogressHandler')
+        }
+        function doneHandler (event) {
+            console.log('gsddoneHandler')
+        }
+    },
+    getParams: function () {
+        return {
+            chunkNumber: this.offset + 1,
+            chunkSize: this.uploader.opts.chunkSize,
+            currentChunkSize: this.endByte - this.startByte,
+            totalSize: this.file.size,
+            identifier: this.file.uniqueIdentifier,
+            filename: this.file.name,
+            relativePath: this.file.relativePath,
+            totalChunks: this.file.chunks.length
+        }
+    },
+    prepareXhrRequest: function (method, isTest, paramsMethod, blob) {
+        var query = utils.evalOpts(this.uploader.opts.query, this.file, this, isTest)
+        query = utils.extend(this.getParams(), query)
+        console.log('gsdquery', query)
+        var target = utils.evalOpts(this.uploader.opts.target, this.file, this, isTest)
+        var data = null
+        if (method === 'GET' || paramsMethod === 'octet') {
+            // TODO
+        } else {
+            data = new FormData()
+            utils.each(query, function (v, k) {
+                data.append(k, v)
+            })
+            if (typeof blob !== 'undefined') {
+                data.append(this.uploader.opts.fileParameterName, blob, this.file.name)
+            }
+            console.log('gsddata', data)
+        }
+        this.xhr.open(method, target, true)
+        this.xhr.withCredentials = this.uploader.opts.withCredentials
+        utils.each(utils.evalOpts(this.uploader.opts.headers, this.file, this, isTest), function (v, k) {
+            this.xhr.setRequestHeader(k, v)
+        }, this)
+
+        return data
     }
 })
 

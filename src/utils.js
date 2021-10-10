@@ -43,6 +43,12 @@ var utils = {
                     break
                 }
             }
+        } else {
+            for (var k in ary) {
+                if (func.call(context, ary[k], k, ary) === false) {
+                    break
+                }
+            }
         }
     },
     isFunction: isFunction,
@@ -61,6 +67,12 @@ var utils = {
     },
     isString: function (s) {
         return typeof s === 'string'
+    },
+    evalOpts: function (data, args) {
+        if (utils.isFunction(data)) {
+            // TODO
+        }
+        return data
     }
 }
 module.exports = utils

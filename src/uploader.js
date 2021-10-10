@@ -39,6 +39,14 @@ Uploader.defaults = {
     maxChunkRetries: 0,
     preprocess: null,
     readFileFn: webAPIFileRead,
+    testChunks: false, // TODO
+    method: 'multipart',
+    uploadMethod: 'POST',
+    fileParameterName: 'file',
+    query: {},
+    target: '/',
+    withCredentials: false,
+    headers: {},
 }
 
 
