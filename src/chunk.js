@@ -20,7 +20,11 @@ var STATUS = Chunk.STATUS = {
 
 utils.extend(Chunk.prototype, {
     computeEndByte: function () {
-        return 0 // TODO
+        var endByte = Math.min(this.file.size, (this.offset + 1) * this.chunkSize)
+        if (this.file.size - endByte < this.chunkSize && !this.uploader.opts.forceChunkSize) {
+            endByte = this.file.size
+        }
+        return endByte
     },
     abort: function () {
         console.log('gsdabort')
