@@ -1,5 +1,7 @@
 {
-  "dependencies": {
-    "express": "^4.3.1"
+  "dependencies": {},
+  "devDependencies": {
+    "express": "^4.17.1",
+    "http-proxy-middleware": "^2.0.1"
   }
 }

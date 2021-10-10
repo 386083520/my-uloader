@@ -1,6 +1,6 @@
 (function () {
     var r = new Uploader({
-        target: '/upload',
+        target: '/upload/uploadFile',
         singleFile: true
     })
     $('.uploader-drop').show();
