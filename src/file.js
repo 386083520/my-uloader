@@ -128,10 +128,25 @@ utils.extend(File.prototype, {
     isComplete: function () {
         return true
     },
+    getRoot: function () {
+        if (this.isRoot) {
+            return this
+        }
+        return this // TODO
+    },
     _chunkEvent: function (chunk, evt, message) {
         console.log('gsd_chunkEvent', chunk, evt, message)
+        var uploader = this.uploader
         var STATUS = Chunk.STATUS
+        var rootFile = this.getRoot()
+        var that = this
+        var triggerProgress = function () {
+            uploader._trigger('fileProgress', rootFile, that, chunk)
+        }
         switch (evt) {
+            case STATUS.PROGRESS:
+                triggerProgress()
+                break
             case STATUS.ERROR:
                 break
             case STATUS.SUCCESS:
@@ -156,6 +171,9 @@ utils.extend(File.prototype, {
     },
     getFormatSize: function () {
         return '20'
+    },
+    progress: function () {
+        return 0.5
     }
 })
 

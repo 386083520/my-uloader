@@ -19,7 +19,8 @@ var STATUS = Chunk.STATUS = {
     PENDING: 'pending',
     UPLOADING: 'uploading',
     SUCCESS: 'success',
-    ERROR: 'error'
+    ERROR: 'error',
+    PROGRESS: 'progress',
 }
 
 utils.extend(Chunk.prototype, {
@@ -97,7 +98,7 @@ utils.extend(Chunk.prototype, {
         this.xhr.send(data)
         var $ = this
         function progressHandler (event) {
-            console.log('gsdprogressHandler')
+            $._event(STATUS.PROGRESS, event)
         }
         function doneHandler (event) {
             var msg = $.message()

@@ -38,6 +38,11 @@
             $('.uploader-list').append($self);
         })
     })
+    r.on('fileProgress', function (rootFile, file) {
+        rootFile.$el.find('.uploader-file-progress')
+            .html()
+        $('.progress-bar').css({width:Math.floor(r.progress()*100) + '%'});
+    })
     window.r = {
         upload: function () {
             r.resume();
