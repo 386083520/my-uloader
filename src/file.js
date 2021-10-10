@@ -147,6 +147,15 @@ utils.extend(File.prototype, {
             this.uploader.uploadNextChunk()
         }
 
+    },
+    cancel: function () {
+        console.log('gsdcancel')
+    },
+    pause: function () {
+        console.log('gsdpause')
+    },
+    getFormatSize: function () {
+        return '20'
     }
 })
 

@@ -23,6 +23,20 @@
         <div class="uploader-drop">
             Drop files here to upload or <a class="uploader-browse-folder"><u>select folder</u></a> or <a class="uploader-browse"><u>select from your computer</u></a> or <a class="uploader-browse-image"><u>select images</u></a>
         </div>
+        <div class="uploader-progress">
+            <table>
+                <tr>
+                    <td width="100%"><div class="progress-container"><div class="progress-bar"></div></div></td>
+                    <td class="progress-text" nowrap="nowrap"></td>
+                    <td class="progress-pause" nowrap="nowrap">
+                        <a href="javascript:;" onclick="r.upload()" class="progress-resume-link"><img src="resume.png" title="Resume upload" /></a>
+                        <a href="javascript:;" onclick="r.pause()" class="progress-pause-link"><img src="pause.png" title="Pause upload" /></a>
+                        <a href="javascript:;" onclick="r.cancel()" class="progress-cancel-link"><img src="cancel.png" title="Cancel upload" /></a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <ul class="uploader-list"></ul>
         <script src="./app.js"></script>
     </div>
 </body>
