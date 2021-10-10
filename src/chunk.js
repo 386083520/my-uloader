@@ -2,6 +2,7 @@ var utils = require('./utils')
 function Chunk (uploader, file, offset) {
     utils.defineNonEnumerable(this, 'uploader', uploader)
     utils.defineNonEnumerable(this, 'file', file)
+    utils.defineNonEnumerable(this, 'bytes', null)
     this.offset = offset
     this.readState = 0
     this.pendingRetry = false
@@ -50,6 +51,12 @@ utils.extend(Chunk.prototype, {
             // TODO
             return _status
         }
+    },
+    readFinished: function (bytes) {
+        console.log('gsdbytes', bytes)
+        this.readState = 2
+        this.bytes = bytes
+        this.send()
     },
     send: function () {
         var preprocess = this.uploader.opts.preprocess
