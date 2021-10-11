@@ -39,6 +39,7 @@
         })
     })
     r.on('fileProgress', function (rootFile, file) {
+        console.log('gsdfileProgress')
         rootFile.$el.find('.uploader-file-progress')
             .html()
         $('.progress-bar').css({width:Math.floor(r.progress()*100) + '%'});
