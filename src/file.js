@@ -32,6 +32,7 @@ function File (uploader, file, parent) {
     this.averageSpeed = 0
     this.currentSpeed = 0
     this.paused = uploader.opts.initialPaused
+    this._prevProgress = 0
 
     this.bootstrap()
 }
@@ -86,6 +87,7 @@ utils.extend(File.prototype, {
         // TODO
         this.abort(true)
         this._resetError()
+        this._prevProgress = 0
         // TODO
         var round = opts.forceChunkSize ? Math.ceil : Math.floor
         var chunks = Math.max(round(this.size / opts.chunkSize), 1)
@@ -173,7 +175,17 @@ utils.extend(File.prototype, {
         return '20'
     },
     progress: function () {
-        return 0.5
+        var ret = 0
+        this._eachAccess(function (file, index) {
+
+        }, function () {
+            if (this.chunks.length === 1) {
+                this._prevProgress = Math.max(this._prevProgress, this.chunks[0].progress())
+                ret = this._prevProgress
+                return
+            }
+        })
+        return ret
     }
 })
 

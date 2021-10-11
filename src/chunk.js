@@ -13,6 +13,8 @@ function Chunk (uploader, file, offset) {
     this.startByte = this.offset * this.chunkSize
     this.endByte = this.computeEndByte()
     this.tested = false
+    this.loaded = 0
+    this.total = 0
 }
 var STATUS = Chunk.STATUS = {
     READING: 'reading',
@@ -89,6 +91,8 @@ utils.extend(Chunk.prototype, {
             this.test()
             return
         }
+        this.loaded = 0
+        this.total = 0
         this.xhr = new XMLHttpRequest()
         this.xhr.upload.addEventListener('progress', progressHandler, false)
         this.xhr.addEventListener('load', doneHandler, false)
@@ -98,6 +102,11 @@ utils.extend(Chunk.prototype, {
         this.xhr.send(data)
         var $ = this
         function progressHandler (event) {
+            console.log('gsdprogressHandler', event)
+            if (event.lengthComputable) {
+                $.loaded = event.loaded
+                $.total = event.total
+            }
             $._event(STATUS.PROGRESS, event)
         }
         function doneHandler (event) {
@@ -157,6 +166,16 @@ utils.extend(Chunk.prototype, {
         }, this)
 
         return data
+    },
+    progress: function () {
+        var s = this.status()
+        if (s === STATUS.SUCCESS || s === STATUS.ERROR) {
+            return 1
+        } else if (s === STATUS.PENDING) {
+            return 0
+        } else {
+            return this.total > 0 ? this.loaded / this.total : 0
+        }
     }
 })
 
