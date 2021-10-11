@@ -41,6 +41,9 @@ utils.extend(File.prototype, {
     _eachAccess: function (eachFn, fileFn) {
         console.log('gsd_eachAccess', this)
         if (this.isFolder) {
+            utils.each(this.files, function (f, i) {
+                return eachFn.call(this, f, i)
+            }, this)
         }
         fileFn.call(this, this)
     },
@@ -175,9 +178,16 @@ utils.extend(File.prototype, {
         return '20'
     },
     progress: function () {
+        var totalDone = 0
+        var totalSize = 0
         var ret = 0
+        console.log('gsdprogressthis', this)
         this._eachAccess(function (file, index) {
-
+            totalDone += file.progress() * file.size
+            totalSize += file.size
+            if (index === this.files.length - 1) {
+                ret = totalDone / totalSize // TODO
+            }
         }, function () {
             if (this.chunks.length === 1) {
                 this._prevProgress = Math.max(this._prevProgress, this.chunks[0].progress())
@@ -185,6 +195,7 @@ utils.extend(File.prototype, {
                 return
             }
         })
+        console.log('gsdprogress', ret)
         return ret
     }
 })
