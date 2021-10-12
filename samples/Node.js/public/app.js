@@ -41,7 +41,9 @@
     r.on('fileProgress', function (rootFile, file) {
         console.log('gsdfileProgress')
         rootFile.$el.find('.uploader-file-progress')
-            .html()
+            .html(Math.floor(rootFile.progress() * 100) + '% '
+                + Uploader.utils.formatSize(rootFile.averageSpeed) + '/s '
+                + secondsToStr(rootFile.timeRemaining()) + ' remaining')
         $('.progress-bar').css({width:Math.floor(r.progress()*100) + '%'});
     })
     window.r = {
@@ -49,4 +51,9 @@
             r.resume();
         }
     }
-})()
+})();
+
+
+function secondsToStr (temp) {
+    return temp
+}

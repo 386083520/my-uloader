@@ -33,6 +33,8 @@ function File (uploader, file, parent) {
     this.currentSpeed = 0
     this.paused = uploader.opts.initialPaused
     this._prevProgress = 0
+    this._prevUploadedSize = 0
+    this._lastProgressCallback = Date.now()
 
     this.bootstrap()
 }
@@ -141,6 +143,28 @@ utils.extend(File.prototype, {
         }
         return this // TODO
     },
+    sizeUploaded: function () {
+        var size = 0
+        this._eachAccess(function (file) {
+
+        }, function () {
+            utils.each(this.chunks, function (chunk) {
+                size += chunk.sizeUploaded()
+            })
+        })
+        return size
+    },
+    _measureSpeed: function () {
+        var smoothingFactor = this.uploader.opts.speedSmoothingFactor
+        var timeSpan = Date.now() - this._lastProgressCallback
+        if (!timeSpan) {
+            return
+        }
+        var uploaded = this.sizeUploaded()
+        this.currentSpeed = Math.max((uploaded - this._prevUploadedSize) / timeSpan * 1000, 0)
+        this.averageSpeed = smoothingFactor * this.currentSpeed + (1 - smoothingFactor) * this.averageSpeed
+        this._prevUploadedSize = uploaded
+    },
     _chunkEvent: function (chunk, evt, message) {
         console.log('gsd_chunkEvent', chunk, evt, message)
         var uploader = this.uploader
@@ -148,7 +172,9 @@ utils.extend(File.prototype, {
         var rootFile = this.getRoot()
         var that = this
         var triggerProgress = function () {
+            that._measureSpeed()
             uploader._trigger('fileProgress', rootFile, that, chunk)
+            that._lastProgressCallback = Date.now()
         }
         switch (evt) {
             case STATUS.PROGRESS:
@@ -207,6 +233,9 @@ utils.extend(File.prototype, {
         })
         console.log('gsdprogress', ret)
         return ret
+    },
+    timeRemaining: function () {
+        return 10
     }
 })
 

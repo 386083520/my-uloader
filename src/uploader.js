@@ -51,9 +51,10 @@ Uploader.defaults = {
         cb(null, response)
     },
     checkChunkUploadedByResponse: null,
+    speedSmoothingFactor: 0.1,
 }
 
-
+Uploader.utils = utils
 Uploader.prototype = utils.extend({}, File.prototype)
 utils.extend(Uploader.prototype, event)
 utils.extend(Uploader.prototype, {

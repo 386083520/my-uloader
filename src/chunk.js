@@ -176,6 +176,13 @@ utils.extend(Chunk.prototype, {
         } else {
             return this.total > 0 ? this.loaded / this.total : 0
         }
+    },
+    sizeUploaded: function () {
+        var size = this.endByte - this.startByte
+        if (this.status() !== STATUS.SUCCESS) {
+            size = this.progress() * size
+        }
+        return size
     }
 })
 
