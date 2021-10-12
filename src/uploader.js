@@ -52,6 +52,7 @@ Uploader.defaults = {
     },
     checkChunkUploadedByResponse: null,
     speedSmoothingFactor: 0.1,
+    progressCallbacksInterval: 200,
 }
 
 Uploader.utils = utils

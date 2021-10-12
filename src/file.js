@@ -165,6 +165,9 @@ utils.extend(File.prototype, {
         this.averageSpeed = smoothingFactor * this.currentSpeed + (1 - smoothingFactor) * this.averageSpeed
         this._prevUploadedSize = uploaded
     },
+    _checkProgress: function (file) {
+        return Date.now() - this._lastProgressCallback >= this.uploader.opts.progressCallbacksInterval
+    },
     _chunkEvent: function (chunk, evt, message) {
         console.log('gsd_chunkEvent', chunk, evt, message)
         var uploader = this.uploader
@@ -178,12 +181,17 @@ utils.extend(File.prototype, {
         }
         switch (evt) {
             case STATUS.PROGRESS:
-                triggerProgress()
+                if (this._checkProgress()) {
+                    triggerProgress()
+                }
                 break
             case STATUS.ERROR:
                 break
             case STATUS.SUCCESS:
                 this._updateUploadedChunks(message, chunk)
+                if (this.isComplete()) {
+
+                }
                 break
         }
     },
