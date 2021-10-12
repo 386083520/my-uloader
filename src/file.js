@@ -235,7 +235,28 @@ utils.extend(File.prototype, {
         return ret
     },
     timeRemaining: function () {
-        return 10
+        var ret = 0
+        this._eachAccess(function (file, i) {
+
+        }, function () {
+            if (this.paused || this.error) {
+                ret = 0
+                return
+            }
+            var delta = this.size - this.sizeUploaded()
+            ret = calRet(delta, this.averageSpeed)
+        })
+        return ret
+        function calRet (delta, averageSpeed) {
+            console.log('gsdcalRet', delta, averageSpeed)
+            if (delta && !averageSpeed) {
+                return Number.POSITIVE_INFINITY
+            }
+            if (!delta && !averageSpeed) {
+                return 0
+            }
+            return Math.floor(delta / averageSpeed)
+        }
     }
 })
 
