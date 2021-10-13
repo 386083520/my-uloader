@@ -34,6 +34,7 @@ function File (uploader, file, parent) {
     this.paused = uploader.opts.initialPaused
     this._prevProgress = 0
     this._prevUploadedSize = 0
+    this.completed = false
     this._lastProgressCallback = Date.now()
 
     this.bootstrap()
@@ -135,7 +136,26 @@ utils.extend(File.prototype, {
         this.paused = false
     },
     isComplete: function () {
-        return true
+        if (!this.completed) {
+            var outstanding = false
+            this._eachAccess(function (file) {
+            }, function () {
+                if (this.error) {
+                    outstanding = true
+                } else {
+                    var STATUS = Chunk.STATUS
+                    utils.each(this.chunks, function (chunk) {
+                        var status = chunk.status()
+                        if (status === STATUS.ERROR || status === STATUS.PENDING || status === STATUS.UPLOADING || status === STATUS.READING || chunk.preprocessState === 1 || chunk.readState === 1) {
+                            outstanding = true
+                            return false
+                        }
+                    })
+                }
+            })
+            this.completed = !outstanding
+        }
+        return this.completed
     },
     getRoot: function () {
         if (this.isRoot) {
@@ -190,7 +210,10 @@ utils.extend(File.prototype, {
             case STATUS.SUCCESS:
                 this._updateUploadedChunks(message, chunk)
                 if (this.isComplete()) {
-
+                    triggerProgress()
+                    this.currentSpeed = 0
+                    this.averageSpeed = 0
+                    uploader._trigger('fileSuccess', rootFile, this, message, chunk)
                 }
                 break
         }
